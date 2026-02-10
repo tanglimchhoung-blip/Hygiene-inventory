@@ -64,6 +64,15 @@
         th { background: #f8fafc; font-weight: 600; color: var(--text-light); }
         tr:last-child td { border-bottom: none; }
         
+        /* Financial Report Tables */
+        .report-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+        .financial-table th { text-align: right; }
+        .financial-table td { text-align: right; }
+        .financial-table th:first-child, .financial-table td:first-child { text-align: left; }
+        .font-bold { font-weight: 700; }
+        .text-green { color: var(--success); }
+        .text-red { color: var(--danger); }
+
         /* Status Badges */
         .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 99px; font-size: 0.75rem; font-weight: 600; }
         .badge-NEW { background: #e0f2fe; color: #0284c7; }
@@ -97,8 +106,6 @@
             main { padding: 0; max-width: none; }
             .card { box-shadow: none; border: none; padding: 0; }
             .print-only { display: block !important; }
-            /* Invoice specific */
-            .invoice-header { display: flex; justify-content: space-between; margin-bottom: 2rem; border-bottom: 2px solid #000; padding-bottom: 1rem; }
         }
         .print-only { display: none; }
     </style>
@@ -108,7 +115,7 @@
 <div class="app-container">
     <header>
         <h1>Internal ERP</h1>
-        <div style="font-size: 0.8rem; color: var(--text-light);">v1.0</div>
+        <div style="font-size: 0.8rem; color: var(--text-light);">v1.1</div>
     </header>
 
     <nav>
@@ -116,6 +123,7 @@
         <button class="nav-btn" onclick="showTab('sales')">Sales Orders</button>
         <button class="nav-btn" onclick="showTab('expenses')">Expenses</button>
         <button class="nav-btn" onclick="showTab('dashboard')">Dashboard</button>
+        <button class="nav-btn" onclick="showTab('reports')">Financial Reports</button>
     </nav>
 
     <main>
@@ -183,7 +191,6 @@
 
         <!-- SALES ORDERS SECTION -->
         <section id="sales" class="section">
-            <!-- Sales List View -->
             <div id="sales-list-view">
                 <div class="card">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
@@ -211,7 +218,6 @@
                 </div>
             </div>
 
-            <!-- Create/Edit Order View -->
             <div id="sales-form-view" style="display:none;">
                 <div class="card">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
@@ -221,57 +227,21 @@
                     <form id="form-sales" onsubmit="handleSalesSubmit(event)">
                         <input type="hidden" name="order_id" id="sales-order-id">
                         <div class="form-grid">
-                            <div class="form-group">
-                                <label>Date</label>
-                                <input type="date" name="order_date" required id="sales-date">
-                            </div>
-                            <div class="form-group">
-                                <label>Location</label>
-                                <select name="location" id="sales-location" required></select>
-                            </div>
-                            <div class="form-group">
-                                <label>Customer Name</label>
-                                <input type="text" name="customer_name" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Phone</label>
-                                <input type="text" name="telephone">
-                            </div>
-                            <div class="form-group">
-                                <label>Address</label>
-                                <input type="text" name="customer_address">
-                            </div>
-                            <div class="form-group">
-                                <label>Delivery Co.</label>
-                                <select name="delivery_company" id="sales-delivery"></select>
-                            </div>
-                            <div class="form-group">
-                                <label>Currency</label>
-                                <select name="currency" id="sales-currency"></select>
-                            </div>
-                            <div class="form-group">
-                                <label>Order Total</label>
-                                <input type="number" step="0.01" id="sales-total" class="readonly" readonly>
-                            </div>
-                            <div class="form-group">
-                                <label>Paid Amount</label>
-                                <input type="number" step="0.01" name="paid_amount" value="0" id="sales-paid">
-                            </div>
+                            <div class="form-group"><label>Date</label><input type="date" name="order_date" required id="sales-date"></div>
+                            <div class="form-group"><label>Location</label><select name="location" id="sales-location" required></select></div>
+                            <div class="form-group"><label>Customer Name</label><input type="text" name="customer_name" required></div>
+                            <div class="form-group"><label>Phone</label><input type="text" name="telephone"></div>
+                            <div class="form-group"><label>Address</label><input type="text" name="customer_address"></div>
+                            <div class="form-group"><label>Delivery Co.</label><select name="delivery_company" id="sales-delivery"></select></div>
+                            <div class="form-group"><label>Currency</label><select name="currency" id="sales-currency"></select></div>
+                            <div class="form-group"><label>Order Total</label><input type="number" step="0.01" id="sales-total" class="readonly" readonly></div>
+                            <div class="form-group"><label>Paid Amount</label><input type="number" step="0.01" name="paid_amount" value="0" id="sales-paid"></div>
                         </div>
-                        <div class="form-group" style="margin-top: 1rem;">
-                            <label>Note</label>
-                            <textarea name="note" rows="2"></textarea>
-                        </div>
-
+                        <div class="form-group" style="margin-top: 1rem;"><label>Note</label><textarea name="note" rows="2"></textarea></div>
                         <h3>Items</h3>
-                        <div class="items-list" id="sales-items-container">
-                            <!-- Dynamic Items -->
-                        </div>
+                        <div class="items-list" id="sales-items-container"></div>
                         <button type="button" class="btn btn-secondary btn-sm" onclick="addSalesItemRow()" style="margin-top:0.5rem;">+ Add Item</button>
-
-                        <div style="margin-top: 1.5rem; text-align: right;">
-                            <button type="submit" class="btn btn-primary">Create Order</button>
-                        </div>
+                        <div style="margin-top: 1.5rem; text-align: right;"><button type="submit" class="btn btn-primary">Create Order</button></div>
                     </form>
                 </div>
             </div>
@@ -283,34 +253,14 @@
                 <h2>Record Expense</h2>
                 <form id="form-expense" onsubmit="handleExpenseSubmit(event)">
                     <div class="form-grid">
-                        <div class="form-group">
-                            <label>Date</label>
-                            <input type="date" name="date" required id="exp-date">
-                        </div>
-                        <div class="form-group">
-                            <label>Location</label>
-                            <select name="location" id="exp-location" required></select>
-                        </div>
-                        <div class="form-group">
-                            <label>Category</label>
-                            <select name="category" id="exp-cat" required></select>
-                        </div>
-                        <div class="form-group">
-                            <label>Currency</label>
-                            <select name="currency" id="exp-currency"></select>
-                        </div>
-                        <div class="form-group">
-                            <label>Amount</label>
-                            <input type="number" step="0.01" name="amount" required>
-                        </div>
+                        <div class="form-group"><label>Date</label><input type="date" name="date" required id="exp-date"></div>
+                        <div class="form-group"><label>Location</label><select name="location" id="exp-location" required></select></div>
+                        <div class="form-group"><label>Category</label><select name="category" id="exp-cat" required></select></div>
+                        <div class="form-group"><label>Currency</label><select name="currency" id="exp-currency"></select></div>
+                        <div class="form-group"><label>Amount</label><input type="number" step="0.01" name="amount" required></div>
                     </div>
-                    <div class="form-group" style="margin-top: 1rem;">
-                        <label>Note</label>
-                        <textarea name="note" rows="2"></textarea>
-                    </div>
-                    <div style="margin-top: 1.5rem; text-align: right;">
-                        <button type="submit" class="btn btn-primary">Save Expense</button>
-                    </div>
+                    <div class="form-group" style="margin-top: 1rem;"><label>Note</label><textarea name="note" rows="2"></textarea></div>
+                    <div style="margin-top: 1.5rem; text-align: right;"><button type="submit" class="btn btn-primary">Save Expense</button></div>
                 </form>
             </div>
         </section>
@@ -319,69 +269,135 @@
         <section id="dashboard" class="section">
             <div class="card">
                 <div style="display:flex; gap:1rem; align-items:flex-end; margin-bottom:1.5rem;">
-                    <div class="form-group" style="flex:1;">
-                        <label>From Date</label>
-                        <input type="date" id="dash-from">
-                    </div>
-                    <div class="form-group" style="flex:1;">
-                        <label>To Date</label>
-                        <input type="date" id="dash-to">
-                    </div>
-                    <div>
-                        <button class="btn btn-primary" onclick="loadDashboard()">Update Report</button>
-                    </div>
+                    <div class="form-group" style="flex:1;"><label>From Date</label><input type="date" id="dash-from"></div>
+                    <div class="form-group" style="flex:1;"><label>To Date</label><input type="date" id="dash-to"></div>
+                    <div><button class="btn btn-primary" onclick="loadDashboard()">Update Report</button></div>
                 </div>
-
                 <div class="kpi-grid">
-                    <div class="kpi-card">
-                        <div class="kpi-label">Total Sales (USD)</div>
-                        <div class="kpi-value" id="kpi-sales">0.00</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-label">Total Expenses (USD)</div>
-                        <div class="kpi-value" id="kpi-exp" style="color: var(--danger)">0.00</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-label">Net Profit (Est.)</div>
-                        <div class="kpi-value" id="kpi-profit">0.00</div>
-                    </div>
+                    <div class="kpi-card"><div class="kpi-label">Total Sales (USD)</div><div class="kpi-value" id="kpi-sales">0.00</div></div>
+                    <div class="kpi-card"><div class="kpi-label">Total Expenses (USD)</div><div class="kpi-value" id="kpi-exp" style="color: var(--danger)">0.00</div></div>
+                    <div class="kpi-card"><div class="kpi-label">Net Profit (Est.)</div><div class="kpi-value" id="kpi-profit">0.00</div></div>
                 </div>
-
                 <h3>Remaining Inventory Summary</h3>
                 <div class="table-container">
-                    <table id="inventory-table">
-                        <thead><tr><th>Category</th><th>Product</th><th>Color</th><th>Size</th><th>Qty Left</th></tr></thead>
-                        <tbody><tr><td colspan="5" style="text-align:center">Select dates and click Update</td></tr></tbody>
-                    </table>
+                    <table id="inventory-table"><thead><tr><th>Category</th><th>Product</th><th>Color</th><th>Size</th><th>Qty Left</th></tr></thead><tbody><tr><td colspan="5" style="text-align:center">Select dates and click Update</td></tr></tbody></table>
                 </div>
             </div>
         </section>
+
+        <!-- FINANCIAL REPORTS SECTION -->
+        <section id="reports" class="section">
+            <div class="card">
+                <h2>Financial Reports (P&L & Balance Sheet)</h2>
+                <div style="display:flex; gap:1rem; align-items:flex-end; margin-bottom:1.5rem;">
+                    <div class="form-group" style="flex:1;">
+                        <label>Report Start Date</label>
+                        <input type="date" id="fin-from">
+                    </div>
+                    <div class="form-group" style="flex:1;">
+                        <label>Report End Date</label>
+                        <input type="date" id="fin-to">
+                    </div>
+                    <div>
+                        <button class="btn btn-primary" onclick="loadFinancialReports()">Generate Report</button>
+                    </div>
+                </div>
+
+                <div class="report-grid">
+                    <!-- Profit & Loss -->
+                    <div class="card" style="margin-bottom:0;">
+                        <h3>Profit & Loss Statement</h3>
+                        <div style="font-size:0.85rem; color:var(--text-light); margin-bottom:1rem;">
+                            Period: <span id="fin-period-display">-</span>
+                        </div>
+                        <table class="financial-table">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Amount (USD)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Revenue</strong></td>
+                                    <td id="pnl-revenue" class="text-green">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>(-) Expenses</td>
+                                    <td id="pnl-expenses" class="text-red">0.00</td>
+                                </tr>
+                                <tr style="border-top: 2px solid var(--border);">
+                                    <td><strong>Net Profit</strong></td>
+                                    <td id="pnl-net" class="font-bold">0.00</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Balance Sheet -->
+                    <div class="card" style="margin-bottom:0;">
+                        <h3>Balance Sheet (Snapshot)</h3>
+                        <div style="font-size:0.85rem; color:var(--text-light); margin-bottom:1rem;">
+                            As of: <span id="bs-date-display">-</span>
+                        </div>
+                        <table class="financial-table">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Value (USD)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Assets</strong></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-left:1.5rem;">Inventory Value (Cost)</td>
+                                    <td id="bs-assets">0.00</td>
+                                </tr>
+                                <tr style="border-top: 2px solid var(--border);">
+                                    <td><strong>Total Assets</strong></td>
+                                    <td id="bs-total-assets" class="font-bold">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Equity</strong></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-left:1.5rem;">Retained Earnings</td>
+                                    <td id="bs-equity">0.00</td>
+                                </tr>
+                                <tr style="border-top: 2px solid var(--border);">
+                                    <td><strong>Total Equity</strong></td>
+                                    <td id="bs-total-equity" class="font-bold">0.00</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <!-- TOAST CONTAINER -->
     <div id="toast-container"></div>
 </div>
 
-<!-- PRINT TEMPLATE (Hidden) -->
-<div id="print-area" class="print-only"></div>
-
 <script>
-    // ================= CONFIGURATION =================
     const API_BASE = "https://script.google.com/macros/s/AKfycbzssnNteju0Tqjzln8Y1vP2YsmR21c5yxOoNJ5wGoWz7VYpfkecJSOdZW9ZVfb-mVhW/exec"; 
     
-    // ================= STATE =================
     let LISTS = {};
 
-    // ================= INITIALIZATION =================
     document.addEventListener('DOMContentLoaded', async () => {
-        // Set default dates
         const today = new Date().toISOString().split('T')[0];
-        document.getElementById('inv-date').value = today;
-        document.getElementById('sales-date').value = today;
-        document.getElementById('exp-date').value = today;
         
-        document.getElementById('dash-from').value = today;
-        document.getElementById('dash-to').value = today;
+        // Set dates for all forms
+        ['inv-date', 'sales-date', 'exp-date', 'dash-from', 'dash-to', 'fin-from', 'fin-to'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.value = today;
+        });
 
         if (API_BASE.includes("PASTE_")) {
             showToast("Please configure API_URL in index.html", "error");
@@ -392,12 +408,10 @@
         await loadSalesRecent();
     });
 
-    // ================= API HELPERS =================
     async function apiGet(action, params = {}) {
         const url = new URL(API_BASE);
         url.searchParams.append("action", action);
         Object.keys(params).forEach(k => url.searchParams.append(k, params[k]));
-        
         try {
             const res = await fetch(url);
             return await res.json();
@@ -421,13 +435,10 @@
         }
     }
 
-    // ================= UI LOGIC =================
     function showTab(tabId) {
         document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
-        
         document.getElementById(tabId).classList.add('active');
-        // Find button that calls this tab
         const btns = Array.from(document.querySelectorAll('.nav-btn'));
         const activeBtn = btns.find(b => b.getAttribute('onclick').includes(tabId));
         if(activeBtn) activeBtn.classList.add('active');
@@ -450,11 +461,9 @@
             populateSelect('inv-cat', LISTS.PROD_CAT);
             populateSelect('inv-color', LISTS.PROD_COLOR);
             populateSelect('inv-size', LISTS.PROD_SIZE);
-
             populateSelect('sales-location', LISTS.LOCATION);
             populateSelect('sales-delivery', LISTS.DELIVERY_COMPANY);
             populateSelect('sales-currency', LISTS.CURRENCY);
-
             populateSelect('exp-location', LISTS.LOCATION);
             populateSelect('exp-cat', LISTS.EXP_CAT);
             populateSelect('exp-currency', LISTS.CURRENCY);
@@ -477,15 +486,13 @@
         }
     }
 
-    // ================= INVENTORY LOGIC =================
+    // --- Inventory Logic ---
     function calcInvTotal() {
         const rmb = parseFloat(document.querySelector('[name=unit_rmb]').value) || 0;
         const fx = parseFloat(document.querySelector('[name=fx]').value) || 1;
         const qty = parseFloat(document.querySelector('[name=qty]').value) || 0;
-        
         const unitUsd = rmb / fx;
         const totalUsd = unitUsd * qty;
-        
         document.getElementById('inv-unit-usd').value = unitUsd.toFixed(2);
         document.getElementById('inv-total-usd').value = totalUsd.toFixed(2);
     }
@@ -494,7 +501,6 @@
         e.preventDefault();
         const formData = new FormData(e.target);
         const data = Object.fromEntries(formData.entries());
-        
         const res = await apiPost("inventory_in", data);
         if (res.ok) {
             showToast(res.message);
@@ -505,11 +511,11 @@
         }
     }
 
-    // ================= SALES LOGIC =================
+    // --- Sales Logic ---
     function showNewOrderForm() {
         document.getElementById('sales-list-view').style.display = 'none';
         document.getElementById('sales-form-view').style.display = 'block';
-        addSalesItemRow(); // Add first item
+        addSalesItemRow();
     }
 
     function showSalesList() {
@@ -520,7 +526,6 @@
 
     function addSalesItemRow() {
         const container = document.getElementById('sales-items-container');
-        const idx = container.children.length;
         const div = document.createElement('div');
         div.className = 'items-row';
         div.innerHTML = `
@@ -535,27 +540,19 @@
         container.appendChild(div);
     }
 
-    function updateItemRow(select) {
-        // Optional: Auto-fill product name based on category if we had a product master
-        // For now, just manual entry
-    }
+    function updateItemRow(select) {}
 
     function calcSalesTotal() {
         let total = 0;
         const qties = document.getElementsByName('item_qty[]');
         const prices = document.getElementsByName('item_price[]');
-        
-        for(let i=0; i<qties.length; i++) {
-            total += (parseFloat(qties[i].value)||0) * (parseFloat(prices[i].value)||0);
-        }
+        for(let i=0; i<qties.length; i++) total += (parseFloat(qties[i].value)||0) * (parseFloat(prices[i].value)||0);
         document.getElementById('sales-total').value = total.toFixed(2);
     }
 
     async function handleSalesSubmit(e) {
         e.preventDefault();
         const fd = new FormData(e.target);
-        
-        // Construct items array
         const items = [];
         const cats = fd.getAll('item_cat[]');
         const prods = fd.getAll('item_product[]');
@@ -566,26 +563,17 @@
 
         for(let i=0; i<cats.length; i++) {
             items.push({
-                prod_cat: cats[i],
-                product: prods[i],
-                color: colors[i],
-                size: sizes[i],
-                qty: qtys[i],
-                unit_price: prices[i]
+                prod_cat: cats[i], product: prods[i], color: colors[i], size: sizes[i],
+                qty: qtys[i], unit_price: prices[i]
             });
         }
 
         const data = {
-            order_date: fd.get('order_date'),
-            location: fd.get('location'),
-            customer_name: fd.get('customer_name'),
-            telephone: fd.get('telephone'),
-            customer_address: fd.get('customer_address'),
-            delivery_company: fd.get('delivery_company'),
-            currency: fd.get('currency'),
-            paid_amount: fd.get('paid_amount'),
-            note: fd.get('note'),
-            items: items
+            order_date: fd.get('order_date'), location: fd.get('location'),
+            customer_name: fd.get('customer_name'), telephone: fd.get('telephone'),
+            customer_address: fd.get('customer_address'), delivery_company: fd.get('delivery_company'),
+            currency: fd.get('currency'), paid_amount: fd.get('paid_amount'),
+            note: fd.get('note'), items: items
         };
 
         const res = await apiPost("sale_create", data);
@@ -600,7 +588,6 @@
     async function loadSalesRecent() {
         const tbody = document.querySelector('#sales-table tbody');
         tbody.innerHTML = '<tr><td colspan="7">Loading...</td></tr>';
-        
         const res = await apiGet("sales_recent", { limit: 30 });
         if (res.ok) {
             tbody.innerHTML = '';
@@ -626,9 +613,7 @@
                             <option value="CANCELLED" ${row.status=='CANCELLED'?'selected':''}>CANCELLED</option>
                         </select>
                     </td>
-                    <td>
-                        <button class="btn btn-secondary btn-sm" onclick="printOrder('${row.order_id}')">Print</button>
-                    </td>
+                    <td><button class="btn btn-secondary btn-sm" onclick="printOrder('${row.order_id}')">Print</button></td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -642,25 +627,19 @@
 
     async function updatePayment(id, amount) {
         const res = await apiPost("sale_update_payment", { order_id: id, paid_amount: amount });
-        if(res.ok) {
-            showToast("Payment updated");
-            loadSalesRecent();
-        }
+        if(res.ok) { showToast("Payment updated"); loadSalesRecent(); }
     }
 
     function printOrder(orderId) {
-        // In a real app, fetch details. Here we mock from table or fetch.
-        // For simplicity, we prompt the browser print dialog with a clean view
         showToast("Preparing print view...");
         setTimeout(() => window.print(), 1000);
     }
 
-    // ================= EXPENSES LOGIC =================
+    // --- Expenses Logic ---
     async function handleExpenseSubmit(e) {
         e.preventDefault();
         const formData = new FormData(e.target);
         const data = Object.fromEntries(formData.entries());
-        
         const res = await apiPost("expense_create", data);
         if (res.ok) {
             showToast(res.message);
@@ -671,33 +650,63 @@
         }
     }
 
-    // ================= DASHBOARD LOGIC =================
+    // --- Dashboard Logic ---
     async function loadDashboard() {
         const from = document.getElementById('dash-from').value;
         const to = document.getElementById('dash-to').value;
-        
         const res = await apiGet("report_summary", { from, to });
         if (res.ok) {
             const d = res.data;
             document.getElementById('kpi-sales').innerText = d.total_sales_usd.toFixed(2);
             document.getElementById('kpi-exp').innerText = d.total_expenses_usd.toFixed(2);
             document.getElementById('kpi-profit').innerText = d.net_profit_usd.toFixed(2);
-            
             const tbody = document.querySelector('#inventory-table tbody');
             tbody.innerHTML = '';
             d.inventory_remaining.forEach(row => {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${row.category}</td>
-                    <td>${row.product}</td>
-                    <td>${row.color}</td>
-                    <td>${row.size}</td>
-                    <td><strong>${row.qty}</strong></td>
-                `;
+                tr.innerHTML = `<td>${row.category}</td><td>${row.product}</td><td>${row.color}</td><td>${row.size}</td><td><strong>${row.qty}</strong></td>`;
                 tbody.appendChild(tr);
             });
         } else {
             showToast("Failed to load report", "error");
+        }
+    }
+
+    // --- Financial Reports Logic ---
+    async function loadFinancialReports() {
+        const from = document.getElementById('fin-from').value;
+        const to = document.getElementById('fin-to').value;
+
+        if(!from || !to) {
+            showToast("Please select start and end dates", "error");
+            return;
+        }
+
+        const res = await apiGet("financial_report", { from, to });
+        
+        if (res.ok) {
+            const d = res.data;
+            
+            // P&L
+            document.getElementById('fin-period-display').innerText = `${from} to ${to}`;
+            document.getElementById('pnl-revenue').innerText = d.pnl.revenue.toFixed(2);
+            document.getElementById('pnl-expenses').innerText = d.pnl.expenses.toFixed(2);
+            
+            const netProfitEl = document.getElementById('pnl-net');
+            netProfitEl.innerText = d.pnl.net_profit.toFixed(2);
+            netProfitEl.className = d.pnl.net_profit >= 0 ? 'font-bold text-green' : 'font-bold text-red';
+
+            // Balance Sheet
+            document.getElementById('bs-date-display').innerText = to; // As of end date
+            document.getElementById('bs-assets').innerText = d.balance_sheet.assets.toFixed(2);
+            document.getElementById('bs-total-assets').innerText = d.balance_sheet.assets.toFixed(2);
+            
+            document.getElementById('bs-equity').innerText = d.balance_sheet.equity.toFixed(2);
+            document.getElementById('bs-total-equity').innerText = d.balance_sheet.equity.toFixed(2);
+            
+            showToast("Financial report updated");
+        } else {
+            showToast("Failed to load financial report", "error");
         }
     }
 </script>
