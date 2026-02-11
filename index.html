@@ -427,7 +427,7 @@
 
 <script>
   // ✅ HARD-CODED API URL (Updated)
-  const API_BASE = "https://script.google.com/macros/s/AKfycbwG8vVTeulbTBhlDJr2WzpX4xZ64rw-kRINssJAlrg5DpjADqqmr2D_U2Kj5Mlsp3x5/exec";
+  const API_BASE = "https://script.google.com/macros/s/AKfycbyRnXG8NW4JnpAqDeuCqsSqZP7ymHmyhepnDD3GfSO4Dn6K3C6SFrsv5ydmDKYivbMF/exec";
 
   // ---------- helpers ----------
   const $ = (id)=>document.getElementById(id);
@@ -828,7 +828,7 @@
     const rows = (items && items.length)
       ? items.map(it=>`
           <tr>
-            <td>${escapeHtml(it.sku || it.prod_name || it.product || "Item")}</td>
+            <td>${escapeHtml(it.prod_name || it.sku || it.product || "Item")}</td>
             <td>${escapeHtml(it.prod_color || it.color || "")}</td>
             <td>${escapeHtml(it.prod_size || it.size || "")}</td>
             <td style="text-align:right">${escapeHtml(String(it.qty ?? ""))}</td>
