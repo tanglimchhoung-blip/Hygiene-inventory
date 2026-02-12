@@ -43,6 +43,7 @@
       background:var(--card);
       padding:18px;
       box-shadow:0 1px 0 rgba(0,0,0,.02);
+      margin-bottom:20px;
     }
     .sectionTitle{font-size:20px;margin:0 0 14px 0}
     .grid{
@@ -108,6 +109,7 @@
       border:1px solid var(--line);
       border-radius:12px;
       background:#fff;
+      margin-bottom:12px;
     }
     th, td{
       padding:10px 10px;
@@ -175,71 +177,119 @@
     </div>
 
     <!-- Inventory IN -->
-    <div id="tab-inv" class="card">
-      <h2 class="sectionTitle">Inventory IN</h2>
+    <div id="tab-inv">
+      <div class="card">
+        <h2 class="sectionTitle">Inventory IN</h2>
 
-      <div class="grid">
-        <div>
-          <label>Date (yyyy-mm-dd)</label>
-          <input id="inv_date" type="date" />
-        </div>
-        <div>
-          <label>Warehouse / Location</label>
-          <select id="inv_location"></select>
-        </div>
-        <div>
-          <label>Product Category</label>
-          <select id="inv_prod_cat"></select>
-        </div>
-        <div>
-          <label>Product Name</label>
-          <input id="inv_product" type="text" placeholder="Name" />
+        <div class="grid">
+          <div>
+            <label>Date (yyyy-mm-dd)</label>
+            <input id="inv_date" type="date" />
+          </div>
+          <div>
+            <label>Warehouse / Location</label>
+            <select id="inv_location"></select>
+          </div>
+          <div>
+            <label>Product Category</label>
+            <select id="inv_prod_cat"></select>
+          </div>
+          <div>
+            <label>Product Name</label>
+            <input id="inv_product" type="text" placeholder="Name" />
+          </div>
+
+          <div>
+            <label>Color</label>
+            <select id="inv_color"></select>
+          </div>
+          <div>
+            <label>Size</label>
+            <select id="inv_size"></select>
+          </div>
+          <div>
+            <label>Qty</label>
+            <input id="inv_qty" type="number" min="0" step="1" value="0"/>
+          </div>
+          <div>
+            <label>Unit Price (RMB)</label>
+            <input id="inv_unit_rmb" type="number" min="0" step="0.01" value="0.00"/>
+          </div>
+
+          <div>
+            <label>FX (RMB / USD)</label>
+            <input id="inv_fx" type="number" min="0.01" step="0.01" value="7.20"/>
+          </div>
+          <div>
+            <label>Unit Price (USD) auto</label>
+            <input id="inv_unit_usd" type="text" readonly />
+          </div>
+          <div>
+            <label>Amount (USD) auto</label>
+            <input id="inv_amt_usd" type="text" readonly />
+          </div>
+          <div>
+            <label>Note</label>
+            <input id="inv_note" type="text" />
+          </div>
         </div>
 
-        <div>
-          <label>Color</label>
-          <select id="inv_color"></select>
-        </div>
-        <div>
-          <label>Size</label>
-          <select id="inv_size"></select>
-        </div>
-        <div>
-          <label>Qty</label>
-          <input id="inv_qty" type="number" min="0" step="1" value="0"/>
-        </div>
-        <div>
-          <label>Unit Price (RMB)</label>
-          <input id="inv_unit_rmb" type="number" min="0" step="0.01" value="0.00"/>
+        <div class="row" style="margin-top:10px">
+          <span class="muted">USD calc uses 2 decimals: unit_usd = unit_rmb / fx</span>
         </div>
 
-        <div>
-          <label>FX (RMB / USD)</label>
-          <input id="inv_fx" type="number" min="0.01" step="0.01" value="7.20"/>
+        <div class="right" style="margin-top:14px">
+          <button class="btn" id="btn_save_inv">Save Inventory IN</button>
         </div>
-        <div>
-          <label>Unit Price (USD) auto</label>
-          <input id="inv_unit_usd" type="text" readonly />
+
+        <div class="msg" id="inv_msg" style="display:none"></div>
+      </div>
+
+      <!-- Stock Balance Table -->
+      <div class="card">
+        <div class="row" style="justify-content:space-between;margin-bottom:10px">
+          <h2 class="sectionTitle">Stock Balance</h2>
+          <button class="btn secondary" id="btn_refresh_inv">Refresh</button>
         </div>
-        <div>
-          <label>Amount (USD) auto</label>
-          <input id="inv_amt_usd" type="text" readonly />
-        </div>
-        <div>
-          <label>Note</label>
-          <input id="inv_note" type="text" />
+        <div style="overflow:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Color</th>
+                <th>Size</th>
+                <th style="text-align:right">Qty In</th>
+                <th style="text-align:right">Sold</th>
+                <th style="text-align:right">Balance</th>
+              </tr>
+            </thead>
+            <tbody id="stock_tbody">
+              <tr><td colspan="6" class="muted small">Loading...</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
-      <div class="row" style="margin-top:10px">
-        <span class="muted">USD calc uses 2 decimals: unit_usd = unit_rmb / fx</span>
+      <!-- Recent Inventory In Table -->
+      <div class="card">
+        <h2 class="sectionTitle">Recent Inventory In</h2>
+        <div style="overflow:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Product</th>
+                <th>Color</th>
+                <th>Size</th>
+                <th style="text-align:right">Qty</th>
+              </tr>
+            </thead>
+            <tbody id="inv_tbody">
+              <tr><td colspan="5" class="muted small">No data yet</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-
-      <div class="right" style="margin-top:14px">
-        <button class="btn" id="btn_save_inv">Save Inventory IN</button>
-      </div>
-
-      <div class="msg" id="inv_msg" style="display:none"></div>
     </div>
 
     <!-- Sales -->
@@ -426,7 +476,7 @@
   </div>
 
 <script>
-  // ✅ HARD-CODED API URL (Updated)
+  // ✅ HARD-CODED API URL
   const API_BASE = "https://script.google.com/macros/s/AKfycbyRnXG8NW4JnpAqDeuCqsSqZP7ymHmyhepnDD3GfSO4Dn6K3C6SFrsv5ydmDKYivbMF/exec";
 
   // ---------- helpers ----------
@@ -444,7 +494,6 @@
     el.textContent = (typeof obj === "string") ? obj : JSON.stringify(obj, null, 2);
   }
 
-  // JSONP fetch (works with GAS web apps / GitHub Pages safely)
   function jsonp(url, timeoutMs=15000){
     return new Promise((resolve, reject)=>{
       const cb = "cb_" + Math.random().toString(36).slice(2);
@@ -482,9 +531,6 @@
   }
 
   async function apiPost(action, payload){
-    // Many GAS setups accept POST JSON; but GitHub Pages + CORS can be painful.
-    // We'll send as GET with payload=... if backend supports it.
-    // If your backend already supports POST, keep it. If not, GET fallback makes it stable.
     const packed = encodeURIComponent(JSON.stringify(payload || {}));
     return await apiGet(action, { payload: packed });
   }
@@ -512,6 +558,8 @@
       ["inv","sales","exp","dash"].forEach(x=>{
         $("tab-"+x).classList.toggle("hide", x!==t);
       });
+      // Reload inventory data if clicking inv tab
+      if(t==="inv") loadInventorySummary_();
     });
   });
 
@@ -549,6 +597,49 @@
     $(id).addEventListener("input", recalcInv);
   });
 
+  // ---------- Inventory Summary & History ----------
+  async function loadInventorySummary_(){
+    const tbody = $("stock_tbody");
+    const invBody = $("inv_tbody");
+    tbody.innerHTML = `<tr><td colspan="6" class="muted small">Loading...</td></tr>`;
+    invBody.innerHTML = `<tr><td colspan="5" class="muted small">Loading...</td></tr>`;
+    
+    try{
+      const res = await apiGet("get_inventory_summary");
+      if(!res || !res.ok) throw new Error("Failed to load inventory");
+
+      const stock = res.data || [];
+      if(stock.length === 0){
+        tbody.innerHTML = `<tr><td colspan="6" class="muted small">No inventory found</td></tr>`;
+        invBody.innerHTML = `<tr><td colspan="5" class="muted small">No data yet</td></tr>`;
+        return;
+      }
+
+      // Render Stock Balance
+      tbody.innerHTML = "";
+      stock.forEach(s => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${escapeHtml(s.product)}</td>
+          <td>${escapeHtml(s.color)}</td>
+          <td>${escapeHtml(s.size)}</td>
+          <td style="text-align:right">${s.qty_in}</td>
+          <td style="text-align:right">${s.qty_out}</td>
+          <td style="text-align:right"><strong>${s.balance}</strong></td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // Render Recent History (Mocking for now since backend only gives summary)
+      // Ideally backend should return 'history' array too. 
+      // For now, let's just show that saving works.
+      invBody.innerHTML = `<tr><td colspan="5" class="muted small">Data stored in 'Inventory_IN' sheet.</td></tr>`;
+
+    }catch(err){
+      tbody.innerHTML = `<tr><td colspan="6" class="muted small">ERROR: ${escapeHtml(err.message)}</td></tr>`;
+    }
+  }
+
   // ---------- Inventory IN save ----------
   $("btn_save_inv").addEventListener("click", async ()=>{
     const msgEl = $("inv_msg");
@@ -570,11 +661,15 @@
       };
       const res = await apiPost("save_inventory_in", payload);
       if(!res || !res.ok) throw new Error(res?.message || "save_inventory_in failed");
-      showMsg(msgEl, res, false);
+      showMsg(msgEl, "Saved successfully!", false);
+      // Refresh the balance table after save
+      loadInventorySummary_();
     }catch(err){
       showMsg($("inv_msg"), "ERROR: " + err.message, true);
     }
   });
+
+  $("btn_refresh_inv").addEventListener("click", loadInventorySummary_);
 
   // ---------- Sales items UI ----------
   let lastSavedOrderId = null;
@@ -677,8 +772,10 @@
       const res = await apiPost("save_sale", payload);
       if(!res || !res.ok) throw new Error(res?.message || "save_sale failed");
       lastSavedOrderId = res.data?.order_id || null;
-      showMsg(msgEl, res, false);
+      showMsg(msgEl, "Saved successfully!", false);
       await refreshOrders();
+      // Refresh inventory stock too because items were sold
+      loadInventorySummary_(); 
     }catch(err){
       showMsg($("sales_msg"), "ERROR: " + err.message, true);
     }
@@ -918,7 +1015,7 @@
       };
       const res = await apiPost("save_expense", payload);
       if(!res || !res.ok) throw new Error(res?.message || "save_expense failed");
-      showMsg(msgEl, res, false);
+      showMsg(msgEl, "Saved successfully!", false);
     }catch(err){
       showMsg($("exp_msg"), "ERROR: " + err.message, true);
     }
@@ -934,7 +1031,7 @@
       const to = $("dash_to").value;
       const res = await apiGet("dashboard", { from, to });
       if(!res || !res.ok){
-        $("dash_out").textContent = "Dashboard data not available (backend action=dashboard not implemented).";
+        $("dash_out").textContent = "Dashboard data not available.";
         showMsg(msgEl, res || {ok:false}, true);
         return;
       }
@@ -956,15 +1053,12 @@
 
     try{
       await loadLists();
-      // start sales items with 1 row
-      $("items_list").innerHTML = "";
       $("items_list").appendChild(makeItemRow());
       recalcSaleTotal();
       recalcInv();
-      // load orders once
       refreshOrders();
+      loadInventorySummary_();
     }catch(e){
-      // If lists fail, dropdowns will be empty (still stable, shows message)
       showMsg($("inv_msg"), "ERROR loading lists: " + e.message, true);
       showMsg($("sales_msg"), "ERROR loading lists: " + e.message, true);
       showMsg($("exp_msg"), "ERROR loading lists: " + e.message, true);
